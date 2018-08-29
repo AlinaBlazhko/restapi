@@ -7,39 +7,33 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
+import static io.restassured.RestAssured.get;
+import static io.restassured.RestAssured.given;
+
 public class RestTests {
     @BeforeTest
     public void setUp(){
-        RestAssured.baseURI = "https://jsonplaceholder.typicode.com/users";
-    }
-
-        @Test
-    public void firstTest() {
-        RequestSpecification httpRequest = RestAssured.given();
-        Response response = httpRequest.get();
-
-        Integer statusCode = response.statusCode();
-        System.out.println(statusCode);
-
-        Assert.assertTrue(200 == statusCode);
+        RestAssured.baseURI = "https://jsonplaceholder.typicode.com";
     }
 
     @Test
-    public void secondTest() {
-        RequestSpecification httpRequest = RestAssured.given();
-        Response response = httpRequest.get();
-
-        String contentType = response.header("Content-Type");
-        System.out.println("Content-Type value: " + contentType);
-        Assert.assertEquals(contentType, "application/json; charset=utf-8");
+    public void verifyThatStatusCodeAndContentTypeCorrect() {
+        get("/users")
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .and()
+                .assertThat()
+                .contentType("application/json; charset=utf-8");
     }
 
     @Test
     public void bodyTest(){
-        RequestSpecification httpRequest = RestAssured.given();
-        Response response = httpRequest.get();
-
-        List<String> jsonResponse = response.jsonPath().getList("id");
-        System.out.println(jsonResponse.size());
+        List<String> count = given()
+                                .get("/users")
+                                .jsonPath()
+                                .getList("id");
+        System.out.println(count.size());
+        Assert.assertTrue(count.size() == 10);
     }
 }
